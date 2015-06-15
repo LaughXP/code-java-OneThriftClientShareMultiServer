@@ -6,7 +6,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>commons for thrift</name>
 
-	<distributionManagement>
+	<!-- <distributionManagement>
 		<repository>
 			<id>nexus-releases</id>
 			<name>Local Nexus Repository</name>
@@ -17,7 +17,7 @@
 			<name>Local Nexus Repository</name>
 			<url>http://nexushost:8081/nexus/content/repositories/snapshots</url>
 		</snapshotRepository>
-	</distributionManagement>
+	</distributionManagement> -->
 
 	<dependencies>
 		<dependency>
@@ -72,12 +72,12 @@
 			<version>3.1.0</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.jiuyan</groupId>
 			<artifactId>lc-service</artifactId>
 			<version>1.0.1</version>
 			<scope>test</scope>
-		</dependency>
+		</dependency> -->
 	</dependencies>
 
 	<build>
