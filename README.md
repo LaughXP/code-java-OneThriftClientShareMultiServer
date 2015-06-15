@@ -1,0 +1,2 @@
+# code-java-OneThriftClientShareMultiServer
+在不修改客户端代码的情况下实现一个客户端共享多个服务
