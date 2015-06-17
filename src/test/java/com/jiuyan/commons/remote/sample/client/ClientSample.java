@@ -10,7 +10,7 @@ import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
 
-import com.jiuyan.commons.remote.sample.ThriftServiceSample;
+import com.jiuyan.commons.remote.sample.ThriftServiceSample1;
 /**
  *@Title: TestClientSample.java
  *@Package com.jiuyan.commonsthrift.client
@@ -31,7 +31,7 @@ public class ClientSample {
 		System.out.println("client start!");
 		TTransport transport = new TSocket("localhost", 80); 
 		TProtocol protocol = new TBinaryProtocol(transport);  
-		ThriftServiceSample.Client client = new ThriftServiceSample.Client(protocol);
+		ThriftServiceSample1.Client client = new ThriftServiceSample1.Client(protocol);
         try {
         	System.out.println("client open");
 			transport.open();
