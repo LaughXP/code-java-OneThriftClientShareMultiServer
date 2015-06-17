@@ -35,11 +35,7 @@ public class ThriftBaseProcessor {
 	      out.getTransport().flush();
 	      return true;
 	    }
-	    if("getStatData".equals(msg.name)) {
-	    	fn.process(msg.seqid, in, out, ThriftProcessorFactory.getProcessor(ThriftProcessorFactory.monitor_processor));
-	    } else {
-	    	fn.process(msg.seqid, in, out, ThriftProcessorFactory.getProcessor(ThriftProcessorFactory.other_processor));
-	    }
+	    fn.process(msg.seqid, in, out, ThriftProcessorFactory.getService(ThriftProcessorFactory.getProcessor(msg.name)));
 	    return true;
 	  }
 }

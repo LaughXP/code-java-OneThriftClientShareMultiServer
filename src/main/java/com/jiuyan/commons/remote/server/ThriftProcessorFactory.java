@@ -8,7 +8,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.thrift.ProcessFunction;
 import org.apache.thrift.TBase;
@@ -26,26 +25,22 @@ public class ThriftProcessorFactory {
 	
 	private static Logger logger = LoggerFactory.getLogger(ThriftProcessorFactory. class );
 	
-	private static Map<String , Object> processorMap = new HashMap<String , Object>();
+	private static Map<String , Object> processorConnectService = new HashMap<String , Object>();
 	
-	private static Map<String , Object> methodMap = new HashMap<String , Object>();
+	private static Map<String,  ProcessFunction<?, ? extends TBase>> methodMap = new HashMap<String, ProcessFunction<?, ? extends TBase>>();
+	
+	private static Map<String , String> methodConnectprocessor =  new HashMap<String , String>();
 	
 	public static String monitor_processor = null;
 	
 	public static String other_processor = null;
 	
-	private static Map<String , Object> addProcessor(String key , Object processor) {
-		processorMap.put(key, processor);
-		return processorMap;
+	public static String getProcessor(String method) {
+		return methodConnectprocessor.get(method);
 	}
 	
-	public static Object getProcessor(String key) {
-		return processorMap.get(key);
-	}
-	
-	private static Map<String , Object> addMethod(String key , Object method) {
-		methodMap.put(key, method);
-		return methodMap;
+	public static Object getService(String processorKey) {
+		return processorConnectService.get(processorKey);
 	}
 	
 	public static Object getMethod(String key) {
@@ -83,16 +78,18 @@ public class ThriftProcessorFactory {
 				throw new NullPointerException("cant not get getProcessMap method in "+processorName);
 			}
 			getProcessMap.setAccessible(true);
-			Map<String,  ProcessFunction<?, ? extends TBase>> functionMap = null;
 			Object result = getProcessMap.invoke(ob, new Object[]{new HashMap<String, ProcessFunction<?, ? extends TBase>>()});
-			functionMap = (Map<String, ProcessFunction<?, ? extends TBase>>)result;
-			if(functionMap != null) {
-				Set<String> keys = functionMap.keySet();
-	              for (String key : keys) {
-	                   addMethod(key,functionMap.get(key));
-	              }
+			methodMap.putAll((Map<String, ProcessFunction<?, ? extends TBase>>)result);
+			//记录method:service
+			for(Method method: service.getClass().getDeclaredMethods()) {
+				String methodName = method.getName();
+				if(methodConnectprocessor.get(methodName) != null) {
+					logger.error("has nulti methodName : "+methodName+" serviceImpl:"+serviceImpl);
+					throw new RuntimeException("has nulti methodName : "+methodName+" serviceImpl:"+serviceImpl);
+				}
+				methodConnectprocessor.put(methodName, processorKey);
 			}
-			addProcessor(processorKey,service);
+			processorConnectService.put(processorKey,service);
 		} catch (ClassNotFoundException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();

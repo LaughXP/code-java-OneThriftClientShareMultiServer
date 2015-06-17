@@ -33,6 +33,7 @@ public class ClientSample {
 		TProtocol protocol = new TBinaryProtocol(transport);  
 		ThriftServiceSample.Client client = new ThriftServiceSample.Client(protocol);
         try {
+        	System.out.println("client open");
 			transport.open();
 			System.out.println(client.testPrint());
 		} catch (TTransportException e) {
