@@ -23,7 +23,7 @@ public class ThriftServerBootStrap {
 			@Override
 			public void run() {
 				try {
-					ThriftProcessorFactory.init(config.getProcessorName(), config.getServiceImplName());
+					ThriftProcessorFactory.init(config.getServerConfig());
 					config.getTServer(config.getAbstractServerArgs(config.getTransport())).serve();
 				} catch (TTransportException e) {
 					logger.error(e.getMessage());

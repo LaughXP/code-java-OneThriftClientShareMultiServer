@@ -4,11 +4,12 @@
 package com.jiuyan.commons.remote.server;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.thrift.ProcessFunction;
 import org.apache.thrift.TBase;
 import org.slf4j.Logger;
@@ -27,13 +28,10 @@ public class ThriftProcessorFactory {
 	
 	private static Map<String , Object> processorConnectService = new HashMap<String , Object>();
 	
+	@SuppressWarnings("rawtypes")
 	private static Map<String,  ProcessFunction<?, ? extends TBase>> methodMap = new HashMap<String, ProcessFunction<?, ? extends TBase>>();
 	
 	private static Map<String , String> methodConnectprocessor =  new HashMap<String , String>();
-	
-	public static String monitor_processor = null;
-	
-	public static String other_processor = null;
 	
 	public static String getProcessor(String method) {
 		return methodConnectprocessor.get(method);
@@ -47,12 +45,16 @@ public class ThriftProcessorFactory {
 		return methodMap.get(key);
 	}
 	
-	public static void init(String processorName , String  serviceImpl) {
-		monitor_processor = "StatService";
-		//获得service的名字
-		other_processor = processorName.split("\\.")[5].split("\\$")[0];
-		initProcessorAndMethod(other_processor, processorName, serviceImpl);
-		initProcessorAndMethod(monitor_processor, "com.jiuyan.commons.remote.service.StatService$Processor", "com.jiuyan.commons.remote.service.StatServiceImpl");
+	public static void init(ServerConfig serverConfig) {
+		List<ServerConfig.Service> services = serverConfig.getServices();
+		for(ServerConfig.Service service : services) {
+			if(StringUtils.isBlank(service.getProcessorName()) || StringUtils.isBlank(service.getServiceImplName())) {
+				continue;
+			}
+			String[] classNameProcessorArray = service.getProcessorName().split("\\.");
+			String classNameProcessor = classNameProcessorArray[classNameProcessorArray.length - 1].split("\\$")[0];
+			initProcessorAndMethod(classNameProcessor, service.getProcessorName(), service.getServiceImplName());
+		}
 	}
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private static void initProcessorAndMethod(String processorKey ,String processorName , String serviceImpl) {
@@ -84,32 +86,13 @@ public class ThriftProcessorFactory {
 			for(Method method: service.getClass().getDeclaredMethods()) {
 				String methodName = method.getName();
 				if(methodConnectprocessor.get(methodName) != null) {
-					logger.error("has nulti methodName : "+methodName+" serviceImpl:"+serviceImpl);
-					throw new RuntimeException("has nulti methodName : "+methodName+" serviceImpl:"+serviceImpl);
+					logger.error("has nulti methodName : "+methodName+", serviceImpl:"+serviceImpl);
+					throw new RuntimeException("has multi methodName : "+methodName+", serviceImpl:"+serviceImpl);
 				}
 				methodConnectprocessor.put(methodName, processorKey);
 			}
 			processorConnectService.put(processorKey,service);
-		} catch (ClassNotFoundException e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			logger.error(e.getMessage());
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

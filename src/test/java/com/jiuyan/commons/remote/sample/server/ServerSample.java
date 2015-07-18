@@ -3,6 +3,8 @@
  */
 package com.jiuyan.commons.remote.sample.server;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -54,34 +56,6 @@ public class ServerSample {
 
 	}
 	
-	//加载基本配置
-	public static class ServerConfigImpl implements ServerConfig {
-		
-		@Override
-		public int getPort() {
-			
-			return 80;
-		}
-
-		@Override
-		public int getBacklog() {
-			
-			return 10000;
-		}
-
-		@Override
-		public String getProcessorName() {
-			
-			return "com.jiuyan.commons.remote.sample.ThriftServiceSample$Processor";
-		}
-
-		@Override
-		public String getServiceImplName() {
-			
-			return "com.jiuyan.commons.remote.sample.ThriftServiceImplSample";
-		}
-	}
-	
 	/** 
 	 * @Title: main 
 	 * @Description:  
@@ -93,10 +67,13 @@ public class ServerSample {
 		//初始化自己继承的server配置类
 		ServerConfigFactory server = new ServerSample.ServerConfigFactorySample();
 		//加载基本配置
-		server.loadConfig(new ServerConfigImpl());
+		List<ServerConfig.Service> services = new ArrayList<ServerConfig.Service>();
+		services.add(new ServerConfig.Service("com.jiuyan.commons.remote.sample.ThriftServiceSample1$Processor", "com.jiuyan.commons.remote.sample.ThriftServiceSample1Impl"));
+//		services.add(new ServerConfig.Service("com.jiuyan.commons.remote.sample.ThriftServiceSample2$Processor", "com.jiuyan.commons.remote.sample.ThriftServiceSample2Impl"));
+		services.add(new ServerConfig.Service("com.jiuyan.commons.remote.sample.ThriftServiceSample3$Processor", "com.jiuyan.commons.remote.sample.ThriftServiceSample3Impl"));
+		server.loadConfig(new ServerConfig("127.0.0.1",8089,100,services));
 		//启动服务
 		ThriftServerBootStrap.startUp(server);
-		
 		logger.info("testServer startup");
 	}
 

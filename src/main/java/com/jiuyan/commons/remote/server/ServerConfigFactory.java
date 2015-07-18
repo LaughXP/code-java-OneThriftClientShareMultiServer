@@ -22,13 +22,7 @@ import org.apache.thrift.transport.TTransportException;
  */
 public abstract class ServerConfigFactory {
 	
-	private int port;
-	
-	private int backlog;
-	
-	private String processorName;
-	
-	private String serviceImplName;
+	private ServerConfig serverConfig;
 	
 	//new AbstractServerArgs
 	public abstract AbstractServerArgs<?> getAbstractServerArgs(TServerTransport serverTransport );
@@ -37,47 +31,18 @@ public abstract class ServerConfigFactory {
 	
 	//new TServerTransport
 	public final TServerTransport getTransport() throws TTransportException {
-		InetSocketAddress inetSocketAddress = new InetSocketAddress("127.0.0.1", this.getPort());
+		InetSocketAddress inetSocketAddress = new InetSocketAddress(this.serverConfig.getHost(), this.serverConfig.getPort());
 		ServerSocketTransportArgs ssta = new ServerSocketTransportArgs();
 		ssta.bindAddr(inetSocketAddress);
-		ssta.backlog(this.getBacklog());
+		ssta.backlog(this.serverConfig.getBacklog());
 		return new TServerSocket(ssta);
 	}
 	
 	public final void loadConfig(ServerConfig serverConfig) {
-		this.setPort(serverConfig.getPort());
-		this.setBacklog(serverConfig.getBacklog());
-		this.setProcessorName(serverConfig.getProcessorName());
-		this.setServiceImplName(serverConfig.getServiceImplName());
+		this.serverConfig = serverConfig;
 	}
-
-	private int getPort() {
-		return port;
-	}
-
-	private void setPort(int port) {
-		this.port = port;
-	}
-
-	private int getBacklog() {
-		return backlog;
-	}
-
-	private void setBacklog(int backlog) {
-		this.backlog = backlog;
-	}
-
-	public String getProcessorName() {
-		return processorName;
-	}
-	public void setProcessorName(String processorName) {
-		this.processorName = processorName;
-	}
-	public String getServiceImplName() {
-		return serviceImplName;
-	}
-
-	private void setServiceImplName(String serviceImplName) {
-		this.serviceImplName = serviceImplName;
+	
+	public final ServerConfig getServerConfig() {
+		return serverConfig;
 	}
 }
